@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PhotoFix AI</title>
+
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:light-dark(#f6f7fb,#0d1117);
+  --panel:light-dark(#fff,#151b24);
+  --text:light-dark(#151922,#f5f7fb);
+  --muted:light-dark(#667085,#aab4c3);
+  --line:light-dark(#e5e7eb,#293241);
+  --accent:#6d5dfc
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial;
+  background:var(--bg);
+  color:var(--text)
+}
+main{
+  min-height:100vh;
+  padding:32px 18px
+}
+.wrap{
+  max-width:980px;
+  margin:auto
+}
+header{
+  text-align:center;
+  margin:24px 0 30px
+}
+h1{
+  font-size:42px;
+  margin:0 0 10px;
+  letter-spacing:-1.5px
+}
+header p{
+  color:var(--muted);
+  margin:0;
+  font-size:16px
+}
+.tabs{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:22px
+}
+.tab{
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--text);
+  padding:12px 22px;
+  border-radius:14px;
+  font-weight:700;
+  cursor:pointer
+}
+.tab.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:white
+}
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 12px 40px #00000010
+}
+.drop{
+  border:2px dashed var(--line);
+  border-radius:20px;
+  padding:58px 20px;
+  text-align:center;
+  cursor:pointer
+}
+.icon{font-size:44px}
+.drop h2{margin:12px 0 7px}
+.drop p{
+  color:var(--muted);
+  margin:0
+}
+input{display:none}
+
+.controls{
+  display:none;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:18px
+}
+.control{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  background:transparent;
+  color:var(--text)
+}
+label{
+  font-size:12px;
+  color:var(--muted);
+  display:block;
+  margin-bottom:5px
+}
+
+.preview{
+  display:none;
+  margin-top:20px;
+  text-align:center
+}
+.preview img{
+  max-width:100%;
+  max-height:430px;
+  border-radius:16px
+}
+.actions{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-top:16px
+}
+.btn{
+  border:0;
+  border-radius:13px;
+  padding:13px 20px;
+  font-weight:800;
+  cursor:pointer
+}
+.primary{
+  background:var(--accent);
+  color:white
+}
+.secondary{
+  background:var(--line);
+  color:var(--text)
+}
+.status{
+  text-align:center;
+  color:var(--muted);
+  margin-top:15px;
+  min-height:22px
+}
+
+.features{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:18px
+}
+.feature{
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:16px
+}
+.feature b{
+  display:block;
+  margin-bottom:5px
+}
+.feature span{
+  font-size:13px;
+  color:var(--muted)
+}
+
+.bg-tools{
+  display:none;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:18px
+}
+.bg-tools .control{
+  display:flex;
+  align-items:center;
+  gap:12px
+}
+.bg-tools input[type=color]{
+  display:block;
+  width:54px;
+  height:38px;
+  padding:2px;
+  border:0;
+  background:none
+}
+.bg-tools select{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--text)
+}
+
+.contact{
+  margin-top:24px;
+  text-align:center;
+  padding:20px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--panel)
+}
+.contact b{
+  display:block;
+  font-size:16px;
+  margin-bottom:8px
+}
+.contact a{
+  color:var(--accent);
+  font-weight:800;
+  text-decoration:none
+}
+.contact span{
+  display:block;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:6px
+}
+
+@media(max-width:650px){
+  h1{font-size:34px}
+  .controls,.features,.bg-tools{
+    grid-template-columns:1fr
+  }
+  .card{padding:16px}
+}
+</style>
+</head>
+
+<body>
+
+<main>
+<div class="wrap">
+
+<header>
+<h1>✨ PhotoFix AI</h1>
+<p>Enhance photos without changing the person • Remove backgrounds easily</p>
+</header>
+
+<div class="tabs">
+<button class="tab active" data-mode="enhance">
+✨ Enhance Photo
+</button>
+
+<button class="tab" data-mode="remove">
+✂️ Remove Background
+</button>
+</div>
+
+<section class="card">
+
+<label class="drop" for="file">
+<div class="icon">📸</div>
+
+<h2 id="dropTitle">
+Upload a photo to enhance
+</h2>
+
+<p>
+JPG, PNG or WEBP • Your original photo stays untouched
+</p>
+</label>
+
+<input id="file" type="file" accept="image/*">
+
+<div class="controls" id="controls">
+
+<div class="control">
+<label>Enhance</label>
+
+<select id="scale">
+<option>2×</option>
+<option>4×</option>
+</select>
+</div>
+
+<div class="control">
+<label>Sharpness</label>
+
+<select id="sharp">
+<option>Natural</option>
+<option>Strong</option>
+</select>
+</div>
+
+<div class="control">
+<label>Face preservation</label>
+
+<select disabled>
+<option>ON — Original details</option>
+</select>
+</div>
+
+</div>
+
+<div class="bg-tools" id="bgTools">
+
+<div class="control">
+
+<div>
+<label>Background Color</label>
+
+<input
+id="bgColor"
+type="color"
+value="#ffffff">
+</div>
+
+<div style="flex:1">
+
+<label>Quick Color</label>
+
+<select id="bgPreset">
+
+<option value="#ffffff">White</option>
+<option value="#000000">Black</option>
+<option value="#f2f2f2">Light Gray</option>
+<option value="#1d4ed8">Blue</option>
+<option value="#16a34a">Green</option>
+<option value="#dc2626">Red</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="control">
+
+<div>
+
+<label>Background</label>
+
+<span>
+Choose one solid color after removing the original background.
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="preview" id="preview">
+
+<img id="img">
+
+<div class="actions">
+
+<button class="btn primary" id="process">
+✨ Process Photo
+</button>
+
+<button
+class="btn secondary"
+id="download"
+style="display:none">
+⬇ Download
+</button>
+
+</div>
+</div>
+
+<div class="status" id="status"></div>
+
+</section>
+
+<div class="features">
+
+<div class="feature">
+<b>🧑 Face Preserve</b>
+<span>
+Conservative processing; no face-restoration hallucination.
+</span>
+</div>
+
+<div class="feature">
+<b>🔍 HD Enhance</b>
+<span>
+Local 2×/4× upscale with optional sharpening.
+</span>
+</div>
+
+<div class="feature">
+<b>🪄 Background Remove</b>
+<span>
+AI cutout runs in your browser, then applies your chosen color.
+</span>
+</div>
+
+</div>
+
+<div class="contact">
+
+<b>Made by Ashiq</b>
+
+<a
+href="https://wa.me/8801846433342"
+target="_blank"
+rel="noopener">
+
+📱 WhatsApp: 01846433342
+
+</a>
+
+<span>
+Contact us on WhatsApp
+</span>
+
+</div>
+
+</div>
+</main>
+
+
+<script>
+
+let mode='enhance';
+let file=null;
+let resultBlob=null;
+
+const $=id=>document.getElementById(id);
+
+
+/* TAB SWITCH */
+
+document.querySelectorAll('.tab').forEach(b=>{
+
+b.onclick=()=>{
+
+document
+.querySelectorAll('.tab')
+.forEach(x=>x.classList.remove('active'));
+
+b.classList.add('active');
+
+mode=b.dataset.mode;
+
+$('dropTitle').textContent=
+mode==='enhance'
+?'Upload a photo to enhance'
+:'Upload a photo to remove background';
+
+$('controls').style.display=
+mode==='enhance'?'grid':'none';
+
+$('bgTools').style.display=
+mode==='remove'?'grid':'none';
+
+$('status').textContent='';
+
+$('download').style.display='none';
+
+};
+
+});
+
+
+/* COLOR */
+
+$('bgPreset').onchange=e=>{
+$('bgColor').value=e.target.value;
+};
+
+
+/* FILE UPLOAD */
+
+$('file').onchange=e=>{
+
+file=e.target.files[0];
+
+resultBlob=null;
+
+if(!file)return;
+
+const u=URL.createObjectURL(file);
+
+$('img').src=u;
+
+$('preview').style.display='block';
+
+$('controls').style.display=
+mode==='enhance'?'grid':'none';
+
+$('bgTools').style.display=
+mode==='remove'?'grid':'none';
+
+$('download').style.display='none';
+
+$('status').textContent=
+'Ready — press Process Photo';
+
+};
+
+
+/* CANVAS */
+
+function canvasBlob(
+c,
+type='image/png',
+quality=.95
+){
+
+return new Promise(
+r=>c.toBlob(r,type,quality)
+);
+
+}
+
+
+/* PHOTO ENHANCE */
+
+async function enhance(){
+
+const im=new Image();
+
+im.src=URL.createObjectURL(file);
+
+await im.decode();
+
+const factor=parseInt(
+$('scale').value
+);
+
+const c=document.createElement('canvas');
+
+const x=c.getContext(
+'2d',
+{willReadFrequently:true}
+);
+
+c.width=im.naturalWidth*factor;
+
+c.height=im.naturalHeight*factor;
+
+x.imageSmoothingEnabled=true;
+
+x.imageSmoothingQuality='high';
+
+x.drawImage(
+im,
+0,
+0,
+c.width,
+c.height
+);
+
+
+/* STRONG SHARPEN */
+
+if($('sharp').value==='Strong'){
+
+const s=x.getImageData(
+0,
+0,
+c.width,
+c.height
+);
+
+const d=s.data;
+
+const w=c.width;
+const h=c.height;
+
+for(let y=1;y<h-1;y++)
+
+for(let xx=1;xx<w-1;xx++){
+
+const i=(y*w+xx)*4;
+
+for(let k=0;k<3;k++){
+
+const v=
+d[i+k]*5
+-d[i-4+k]
+-d[i+4+k]
+-d[i-w*4+k]
+-d[i+w*4+k];
+
+d[i+k]=Math.max(
+0,
+Math.min(255,v)
+);
+
+}
+
+}
+
+x.putImageData(s,0,0);
+
+}
+
+return canvasBlob(
+c,
+'image/png'
+);
+
+}
+
+
+/* AI BACKGROUND REMOVER */
+
+async function removeBg(){
+
+return import(
+'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.6/+esm'
+)
+.then(m=>m.removeBackground);
+
+}
+
+
+/* ADD SOLID BACKGROUND */
+
+async function composite(blob){
+
+const im=new Image();
+
+im.src=URL.createObjectURL(blob);
+
+await im.decode();
+
+const c=document.createElement('canvas');
+
+const x=c.getContext('2d');
+
+c.width=im.naturalWidth;
+
+c.height=im.naturalHeight;
+
+const col=$('bgColor').value;
+
+x.fillStyle=col;
+
+x.fillRect(
+0,
+0,
+c.width,
+c.height
+);
+
+x.drawImage(
+im,
+0,
+0
+);
+
+return canvasBlob(
+c,
+'image/png'
+);
+
+}
+
+
+/* PROCESS */
+
+$('process').onclick=async()=>{
+
+if(!file)return;
+
+$('process').disabled=true;
+
+$('status').textContent=
+mode==='enhance'
+?'Enhancing locally — please wait…'
+:'Loading AI background remover — first use can take longer…';
+
+try{
+
+if(mode==='enhance'){
+
+resultBlob=await enhance();
+
+$('status').textContent=
+'✅ Enhanced photo is ready.';
+
+}
+
+else{
+
+const removeBackground=
+await removeBg();
+
+const cut=
+await removeBackground(
+file,
+{
+model:'isnet',
+
+output:{
+format:'image/png',
+quality:1
+},
+
+progress:(k,c,t)=>{
+
+$('status').textContent=
+'AI background removal: '+
+Math.round(c/t*100)+
+'%';
+
+}
+
+}
+);
+
+resultBlob=
+await composite(cut);
+
+$('status').textContent=
+'✅ Background removed and solid color applied.';
+
+}
+
+const u=
+URL.createObjectURL(resultBlob);
+
+$('img').src=u;
+
+$('download').style.display=
+'inline-block';
+
+}
+
+catch(e){
+
+console.error(e);
+
+$('status').textContent=
+'❌ Processing failed. Try a smaller JPG/PNG image.';
+
+}
+
+finally{
+
+$('process').disabled=false;
+
+}
+
+};
+
+
+/* DOWNLOAD */
+
+$('download').onclick=()=>{
+
+if(!resultBlob)return;
+
+const a=document.createElement('a');
+
+a.href=
+URL.createObjectURL(resultBlob);
+
+a.download=
+mode==='enhance'
+?'photofix-enhanced.png'
+:'photofix-background-removed.png';
+
+a.click();
+
+};
+
+</script>
+
+</body>
+</html>
